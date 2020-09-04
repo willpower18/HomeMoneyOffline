@@ -80,8 +80,11 @@ export default function Home() {
                     let saldoString = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(saldo);
                     console.log(saldoString);
                     setSaldo(saldoString);
-                    //realm.close();
+                })
+                .catch(error => {
+                    console.log(error);
                 });
+            Realm.close();
         }
         catch (error) {
             alert('Erro ao Carregar Dados');

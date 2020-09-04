@@ -27,8 +27,11 @@ export default function Receitas() {
                             realm.delete(receita);
                         });
                     }
-                    // realm.close();
+                })
+                .catch(error => {
+                    console.log(error);
                 });
+            Realm.close();
             loadData();
         }
         catch{
@@ -48,8 +51,11 @@ export default function Receitas() {
                         receitasArr.push(receita);
                     }
                     setReceitas(receitasArr);
-                    //realm.close();
-                });
+                })
+                .catch(error => {
+                    console.log(error);
+                }); Realm.
+                    Realm.close();
             return;
         }
         catch (error) {

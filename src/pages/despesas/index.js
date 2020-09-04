@@ -27,8 +27,11 @@ export default function Despesas() {
                             realm.delete(despesa);
                         });
                     }
-                    //realm.close();
+                })
+                .catch(error => {
+                    console.log(error);
                 });
+            Realm.close();
             loadData();
         }
         catch{
@@ -48,8 +51,11 @@ export default function Despesas() {
                         despesasArr.push(despesa);
                     }
                     setDespesas(despesasArr);
-                    // realm.close();
+                })
+                .catch(error => {
+                    console.log(error);
                 });
+            Realm.close();
             return;
         }
         catch (error) {
