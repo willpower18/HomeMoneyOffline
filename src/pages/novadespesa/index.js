@@ -75,7 +75,7 @@ export default function NovaDespesa() {
                     realm.write(() => {
                         realm.create('despesa', data);
                     });
-                    realm.close();
+                    //realm.close();
                 });
             alert('Despesa Lançada Com Sucesso!');
             return;

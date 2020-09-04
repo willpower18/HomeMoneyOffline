@@ -17,6 +17,26 @@ export default function Despesas() {
         navigation.navigate('Home');
     }
 
+    function deleteItem(id) {
+        try {
+            Realm.open({ schema: [DespesasSchema] })
+                .then(realm => {
+                    const despesa = realm.objectForPrimaryKey('despesa', id);
+                    if (despesa !== null | despesa !== undefined) {
+                        realm.write(() => {
+                            realm.delete(despesa);
+                        });
+                    }
+                    //realm.close();
+                });
+            loadData();
+        }
+        catch{
+            alert('Não foi possível excluir!');
+            return;
+        }
+    }
+
     async function loadData() {
         try {
             Realm.open({ schema: [DespesasSchema] })
@@ -28,6 +48,7 @@ export default function Despesas() {
                         despesasArr.push(despesa);
                     }
                     setDespesas(despesasArr);
+                    // realm.close();
                 });
             return;
         }
@@ -39,7 +60,7 @@ export default function Despesas() {
 
     useEffect(() => {
         const ScreenLoad = navigation.addListener('focus', () => {
-            loadData()
+            loadData();
         });
     }, []);
 

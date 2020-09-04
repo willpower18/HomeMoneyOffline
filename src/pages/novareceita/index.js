@@ -77,7 +77,7 @@ export default function NovaReceita() {
                     realm.write(() => {
                         realm.create('receita', data);
                     });
-                    realm.close();
+                    // realm.close();
                 });
             alert('Receita Lançada Com Sucesso!');
             return;

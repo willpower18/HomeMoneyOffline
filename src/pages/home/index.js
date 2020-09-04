@@ -51,18 +51,20 @@ export default function Home() {
         setHoje(dtCompleta);
     }
 
-    async function loadData() {
+    function loadData() {
         try {
             Realm.open({ schema: [ReceitasSchema, DespesasSchema] })
                 .then(realm => {
                     //Receitas
                     let loadedReceitas = realm.objects('receita').filtered(`dtLancamento CONTAINS "${referencia}"`);
+                    console.log(loadedReceitas);
                     let totalReceitas = 0;
                     let totalReceitasString = '';
                     for (let receita of loadedReceitas) {
                         totalReceitas += receita.valor;
                     }
                     totalReceitasString = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalReceitas);
+                    console.log(totalReceitasString);
                     setReceitas(totalReceitasString);
                     //Despesas
                     let loadedDespesas = realm.objects('despesa').filtered(`dtLancamento CONTAINS "${referencia}"`);
@@ -72,12 +74,14 @@ export default function Home() {
                         totalDespesas += despesa.valor;
                     }
                     totalDespesasString = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalDespesas);
+                    console.log(totalDespesasString);
                     setdespesas(totalDespesasString);
                     let saldo = totalReceitas - totalDespesas;
                     let saldoString = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(saldo);
+                    console.log(saldoString);
                     setSaldo(saldoString);
+                    //realm.close();
                 });
-            return;
         }
         catch (error) {
             alert('Erro ao Carregar Dados');
@@ -88,7 +92,7 @@ export default function Home() {
     useEffect(() => {
         const homeScreenLoad = navigation.addListener('focus', () => {
             getRef();
-            loadData()
+            loadData();
         });
     }, []);
 

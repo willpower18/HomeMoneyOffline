@@ -17,6 +17,26 @@ export default function Receitas() {
         navigation.navigate('Home');
     }
 
+    function deleteItem(id) {
+        try {
+            Realm.open({ schema: [ReceitasSchema] })
+                .then(realm => {
+                    const receita = realm.objectForPrimaryKey('receita', id);
+                    if (receita !== null | receita !== undefined) {
+                        realm.write(() => {
+                            realm.delete(receita);
+                        });
+                    }
+                    // realm.close();
+                });
+            loadData();
+        }
+        catch{
+            alert('Não foi possível excluir!');
+            return;
+        }
+    }
+
     async function loadData() {
         try {
             Realm.open({ schema: [ReceitasSchema] })
@@ -28,6 +48,7 @@ export default function Receitas() {
                         receitasArr.push(receita);
                     }
                     setReceitas(receitasArr);
+                    //realm.close();
                 });
             return;
         }
