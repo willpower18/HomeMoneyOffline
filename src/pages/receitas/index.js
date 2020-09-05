@@ -31,36 +31,27 @@ export default function Receitas() {
                 .catch(error => {
                     console.log(error);
                 });
-            Realm.close();
             loadData();
         }
         catch{
             alert('Não foi possível excluir!');
-            return;
         }
     }
 
     async function loadData() {
         try {
-            Realm.open({ schema: [ReceitasSchema] })
+            await Realm.open({ schema: [ReceitasSchema] })
                 .then(realm => {
                     //Receitas
-                    let receitasArr = [];
-                    let loadedReceitas = realm.objects('receita').filtered(`dtLancamento CONTAINS "${referencia}"`);
-                    for (let receita of loadedReceitas) {
-                        receitasArr.push(receita);
-                    }
-                    setReceitas(receitasArr);
+                    const loadedReceitas = realm.objects('receita').filtered(`dtLancamento CONTAINS "${referencia}"`);
+                    setReceitas(loadedReceitas);
                 })
                 .catch(error => {
                     console.log(error);
-                }); Realm.
-                    Realm.close();
-            return;
+                });
         }
         catch (error) {
             alert('Erro ao Carregar Dados');
-            return;
         }
     }
 

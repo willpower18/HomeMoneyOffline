@@ -9,7 +9,6 @@ import styles from './styles';
 
 export default function Home() {
     //Estado da Aplicação
-    const [hoje, setHoje] = useState('');
     const [receitas, setReceitas] = useState('R$ 0,00');
     const [despesas, setdespesas] = useState('R$ 0,00');
     const [referencia, setReferencia] = useState('-');
@@ -39,64 +38,56 @@ export default function Home() {
         navigation.navigate('NovaDespesa', { referencia });
     }
 
-    function getRef() {
-        const today = new Date();
-        const todayString = today.toJSON();
-        const year = todayString.substr(0, 4);
-        const month = todayString.substr(5, 2);
-        const day = todayString.substr(8, 2);
-        const ref = month + "/" + year;
-        const dtCompleta = day + "/" + ref;
-        setReferencia(ref);
-        setHoje(dtCompleta);
-    }
+    async function loadData() {
+        let retorno = {
+            referencia: '-',
+            receitas: 'R$ 0,00',
+            despesas: 'R$ 0,00',
+            saldo: 'R$ 0,00'
+        };
 
-    function loadData() {
         try {
-            Realm.open({ schema: [ReceitasSchema, DespesasSchema] })
+            const today = new Date();
+            const todayString = today.toJSON();
+            const year = todayString.substr(0, 4);
+            const month = todayString.substr(5, 2);
+            const ref = month + "/" + year;
+            await Realm.open({ schema: [ReceitasSchema, DespesasSchema] })
                 .then(realm => {
                     //Receitas
-                    let loadedReceitas = realm.objects('receita').filtered(`dtLancamento CONTAINS "${referencia}"`);
-                    console.log(loadedReceitas);
-                    let totalReceitas = 0;
-                    let totalReceitasString = '';
-                    for (let receita of loadedReceitas) {
-                        totalReceitas += receita.valor;
-                    }
-                    totalReceitasString = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalReceitas);
-                    console.log(totalReceitasString);
-                    setReceitas(totalReceitasString);
+                    let totalReceitas = realm.objects('receita').filtered(`dtLancamento CONTAINS "${ref}"`).sum('valor');
+                    let totalReceitasString = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalReceitas);
                     //Despesas
-                    let loadedDespesas = realm.objects('despesa').filtered(`dtLancamento CONTAINS "${referencia}"`);
-                    let totalDespesas = 0;
-                    let totalDespesasString = '';
-                    for (let despesa of loadedDespesas) {
-                        totalDespesas += despesa.valor;
-                    }
-                    totalDespesasString = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalDespesas);
-                    console.log(totalDespesasString);
-                    setdespesas(totalDespesasString);
+                    let totalDespesas = realm.objects('despesa').filtered(`dtLancamento CONTAINS "${ref}"`).sum('valor');
+                    let totalDespesasString = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalDespesas);
+                    //Saldo
                     let saldo = totalReceitas - totalDespesas;
                     let saldoString = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(saldo);
-                    console.log(saldoString);
-                    setSaldo(saldoString);
+                    retorno.referencia = ref;
+                    retorno.despesas = totalDespesasString;
+                    retorno.receitas = totalReceitasString;
+                    retorno.saldo = saldoString;
                 })
                 .catch(error => {
                     console.log(error);
                 });
-            Realm.close();
         }
         catch (error) {
             alert('Erro ao Carregar Dados');
-            return;
         }
+
+        return retorno;
     }
 
     useEffect(() => {
-        const homeScreenLoad = navigation.addListener('focus', () => {
-            getRef();
-            loadData();
+        const unsubscribe = navigation.addListener('focus', async () => {
+            const returned = await loadData();
+            setReferencia(returned.referencia);
+            setReceitas(returned.receitas);
+            setdespesas(returned.despesas);
+            setSaldo(returned.saldo);
         });
+        return unsubscribe;
     }, []);
 
     return (

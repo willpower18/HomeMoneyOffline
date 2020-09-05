@@ -31,7 +31,6 @@ export default function Despesas() {
                 .catch(error => {
                     console.log(error);
                 });
-            Realm.close();
             loadData();
         }
         catch{
@@ -42,25 +41,18 @@ export default function Despesas() {
 
     async function loadData() {
         try {
-            Realm.open({ schema: [DespesasSchema] })
+            await Realm.open({ schema: [DespesasSchema] })
                 .then(realm => {
                     //Despesas
-                    let despesasArr = [];
                     let loadedDespesas = realm.objects('despesa').filtered(`dtLancamento CONTAINS "${referencia}"`);
-                    for (let despesa of loadedDespesas) {
-                        despesasArr.push(despesa);
-                    }
-                    setDespesas(despesasArr);
+                    setDespesas(loadedDespesas);
                 })
                 .catch(error => {
                     console.log(error);
                 });
-            Realm.close();
-            return;
         }
         catch (error) {
             alert('Erro ao Carregar Dados');
-            return;
         }
     }
 
