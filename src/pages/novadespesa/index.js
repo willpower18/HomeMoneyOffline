@@ -80,6 +80,8 @@ export default function NovaDespesa() {
                 .catch(error => {
                     console.log(error);
                 });
+            setNomeDespesa('');
+            setValor('');
             alert('Despesa Lançada Com Sucesso!');
         }
         catch (error) {

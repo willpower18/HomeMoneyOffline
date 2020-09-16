@@ -82,6 +82,8 @@ export default function NovaReceita() {
                 .catch(error => {
                     console.log(error);
                 });
+            setNomeReceita('');
+            setValor('');
             alert('Receita Lançada Com Sucesso!');
             return;
         }
